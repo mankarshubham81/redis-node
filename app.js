@@ -1,3 +1,5 @@
+//redis node 1) cache aside pattern
+// run => npm run dev
 import express from "express";
 import { getProductDetails, getProducts } from "./api/product.js";
 import Redis from "ioredis";

@@ -31,8 +31,10 @@ app.get("/", async (req, res) => {
     await redis.expire(key, 60);
   }
 
-  if (requestCount > 10) {
-    return res.status(429).send("Too many requests, please try again after 1 min");
+  const timeRemaining = await redis.ttl(key);
+
+  if (requestCount > 5) {
+    return res.status(429).send(`Too many requests, please try again after ${timeRemaining} seconds`);
   }
 
   res.send(`Requested ${requestCount} times`);

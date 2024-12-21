@@ -28,9 +28,8 @@ app.get("/", ratelimiter({limit:5,timer:50, key:"Home"}), async (req, res) => {
 
 app.get("/products", getCashedData("products"), async (req, res) => {
   const productsData = await getProducts();
-  console.log(productsData)
   // await redis.setex("products", 60, JSON.stringify(products.products));
-  await redis.set("products", JSON.stringify(productsData));
+  await redis.setex("products", 70, JSON.stringify(productsData));
 
   res.json({ productsData });
 });

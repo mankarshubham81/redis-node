@@ -6,8 +6,13 @@ export const getProducts = () => {
                     {
                         id:1,
                         name: "Product 1",
-                        price: 100,
-                    }
+                        price: 1100,
+                    },
+                    {
+                        id:2,
+                        name: "Product 2",
+                        price: 1200,
+                    } 
                 ]
             })
         }, 4000);

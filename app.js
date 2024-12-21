@@ -4,6 +4,7 @@ import express from "express";
 import { getProductDetails, getProducts } from "./api/product.js";
 import Redis from "ioredis";
 import dotenv from "dotenv";
+import { getCashedData, ratelimiter } from './middleware/redis.js';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -21,36 +22,17 @@ redis.on("connect", () => {
   console.log("Redis is connected");
 });
 
-app.get("/", async (req, res) => {
-  const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
-  const key = `${clientIp}:request_count`;
-
-  const requestCount = await redis.incr(key);
-
-  if (requestCount === 1) {
-    await redis.expire(key, 60);
-  }
-
-  const timeRemaining = await redis.ttl(key);
-
-  if (requestCount > 5) {
-    return res.status(429).send(`Too many requests, please try again after ${timeRemaining} seconds`);
-  }
-
-  res.send(`Requested ${requestCount} times`);
+app.get("/", ratelimiter({limit:5,timer:50, key:"Home"}), async (req, res) => {
+  res.send(`home route`);
 });
 
-app.get("/products", async (req, res) => {
-  let products = await redis.get("products");
-  if (products) {
-    console.log("Fetched from Redis cache");
-    return res.json({ products: JSON.parse(products) });
-  }
+app.get("/products", getCashedData("products"), async (req, res) => {
+  const productsData = await getProducts();
+  console.log(productsData)
+  // await redis.setex("products", 60, JSON.stringify(products.products));
+  await redis.set("products", JSON.stringify(productsData.products));
 
-  products = await getProducts();
-  await redis.setex("products", 10, JSON.stringify(products.products));
-
-  res.json({ products });
+  res.json({ productsData });
 });
 
 app.get("/product/:id", async (req, res) => {

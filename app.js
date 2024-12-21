@@ -30,7 +30,7 @@ app.get("/products", getCashedData("products"), async (req, res) => {
   const productsData = await getProducts();
   console.log(productsData)
   // await redis.setex("products", 60, JSON.stringify(products.products));
-  await redis.set("products", JSON.stringify(productsData.products));
+  await redis.set("products", JSON.stringify(productsData));
 
   res.json({ productsData });
 });

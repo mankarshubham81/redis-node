@@ -1,8 +1,7 @@
 export const getProducts = () => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            resolve({
-                products: [
+            resolve([
                     {
                         id:1,
                         name: "Product 1",
@@ -13,8 +12,7 @@ export const getProducts = () => {
                         name: "Product 2",
                         price: 1200,
                     } 
-                ]
-            })
+                ])
         }, 4000);
     });
 }
